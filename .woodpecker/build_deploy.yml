@@ -1,0 +1,20 @@
+when:
+  - event: push
+    branch: main
+  - event: manual
+    branch: main
+
+steps:
+  - name: build system
+    image: docker.io/library/archlinux
+    commands:
+      - pacman -Syu --noconfirm --needed pnpm
+      - pnpm build
+
+  - name: deploy
+    image: docker.io/library/archlinux
+    commands:
+      - pacman -Syu --noconfirm --needed rsync
+      - rsync -aP --delete dist/ /mnt
+    volumes:
+      - /srv/astros/website:/mnt:z
